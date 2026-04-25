@@ -1,6 +1,8 @@
 const vscode = require('vscode');
 
-let intervalId;
+let statusBarItem;
+let nextReminderTime;
+let timerId;
 let outputChannel;
 
 /**
@@ -8,54 +10,80 @@ let outputChannel;
  */
 function activate(context) {
     outputChannel = vscode.window.createOutputChannel("Tasbeeh Reminder");
-    outputChannel.appendLine('Tasbeeh Reminder is now active!');
-    
-    // إظهار رسالة عند البدء للتأكد أن الإضافة تعمل
-    vscode.window.showInformationMessage('تم تفعيل إضافة "ذكر الله" بنجاح. ستبدأ التنبيهات بالظهور حسب المدة المحددة.');
+    outputChannel.appendLine('Tasbeeh Reminder v2 is now active!');
 
-    // أمر لعرض تسبيح يدوياً في أي وقت
-    let disposable = vscode.commands.registerCommand('tasbeeh.showNow', function () {
-        showTasbeeh();
-    });
+    // إنشاء أيقونة شريط الحالة (Status Bar)
+    statusBarItem = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Right, 100);
+    statusBarItem.command = 'tasbeeh.showMenu';
+    context.subscriptions.push(statusBarItem);
 
-    context.subscriptions.push(disposable);
+    // تسجيل الأوامر
+    context.subscriptions.push(vscode.commands.registerCommand('tasbeeh.showNow', showTasbeeh));
+    context.subscriptions.push(vscode.commands.registerCommand('tasbeeh.showMenu', showMenu));
 
-    // تشغيل العداد عند تفعيل الإضافة
+    // إظهار رسالة عند البدء
+    vscode.window.showInformationMessage('تم تفعيل إضافة "ذكر الله". انظر أسفل يمين الشاشة لرؤية العداد 📿.');
+
+    // بدء العداد
     startTimer();
 
-    // تحديث العداد عند تغيير الإعدادات من قبل المستخدم
+    // تحديث العداد عند تغيير الإعدادات
     vscode.workspace.onDidChangeConfiguration(e => {
         if (e.affectsConfiguration('tasbeeh.interval')) {
-            outputChannel.appendLine('تم تغيير إعدادات المدة الزمنية، إعادة تشغيل العداد...');
+            outputChannel.appendLine('تم تغيير الإعدادات، إعادة تشغيل العداد...');
             startTimer();
         }
     });
 }
 
 function startTimer() {
-    // إيقاف العداد القديم إذا كان يعمل
-    if (intervalId) {
-        clearInterval(intervalId);
+    if (timerId) {
+        clearInterval(timerId);
     }
 
-    // جلب الإعدادات الخاصة بالإضافة
     const config = vscode.workspace.getConfiguration('tasbeeh');
     let intervalMinutes = config.get('interval');
 
-    outputChannel.appendLine(`جاري ضبط المنبه كل ${intervalMinutes} دقيقة.`);
-
-    // إذا كانت المدة 0 أو أقل، نوقف الإضافة (لا نعرض شيء)
     if (intervalMinutes <= 0) {
+        statusBarItem.hide();
         return;
     }
 
-    // تحويل الدقائق إلى ملي ثانية
-    const intervalMs = intervalMinutes * 60 * 1000;
+    // حساب وقت التنبيه القادم
+    setNextReminder(intervalMinutes);
+    statusBarItem.show();
 
-    // تشغيل العداد الجديد
-    intervalId = setInterval(() => {
+    // تحديث العداد كل 10 ثواني لضمان الدقة وتحديث النص
+    timerId = setInterval(updateStatusBar, 10000);
+    updateStatusBar(); // تحديث فوري للنص
+}
+
+function setNextReminder(minutes) {
+    const now = new Date();
+    nextReminderTime = new Date(now.getTime() + minutes * 60000);
+}
+
+function updateStatusBar() {
+    if (!nextReminderTime) return;
+
+    const now = new Date();
+    const diffMs = nextReminderTime - now;
+
+    // إذا انتهى الوقت
+    if (diffMs <= 0) {
         showTasbeeh();
-    }, intervalMs);
+        const config = vscode.workspace.getConfiguration('tasbeeh');
+        setNextReminder(config.get('interval'));
+    }
+
+    // حساب الدقائق المتبقية لعرضها
+    const diffMinutes = Math.ceil((nextReminderTime - new Date()) / 60000);
+    
+    // إذا كان المتبقي أقل من دقيقة نكتب <1m
+    let displayText = diffMinutes > 0 ? `${diffMinutes}m` : `<1m`;
+    
+    statusBarItem.text = `📿 ${displayText}`;
+    statusBarItem.tooltip = "ذكر الله - اضغط هنا للخيارات";
 }
 
 function showTasbeeh() {
@@ -63,19 +91,45 @@ function showTasbeeh() {
     const messages = config.get('messages');
     
     if (messages && messages.length > 0) {
-        // اختيار رسالة عشوائية من القائمة
         const randomIndex = Math.floor(Math.random() * messages.length);
         const message = messages[randomIndex];
-        
-        // عرض الرسالة للمستخدم
-        vscode.window.showInformationMessage(message);
+        // إضافة زر "تم الذكر" للتشجيع
+        vscode.window.showInformationMessage(message, "تم الذكر 🤍").then(selection => {
+            if (selection === "تم الذكر 🤍") {
+                outputChannel.appendLine('تم تأكيد الذكر، تقبل الله!');
+            }
+        });
     }
 }
 
-// دالة يتم استدعاؤها عند تعطيل الإضافة
+async function showMenu() {
+    const options = [
+        { label: "$(heart) عرض ذكر الآن", description: "يظهر لك رسالة تنبيه فورية" },
+        { label: "$(clock) إيقاف مؤقت (Snooze)", description: "تأجيل التنبيه القادم لمدة 15 دقيقة" },
+        { label: "$(gear) تغيير المدة الزمنية", description: "يفتح إعدادات الإضافة لتغيير المدة" }
+    ];
+
+    const selection = await vscode.window.showQuickPick(options, { placeHolder: "قائمة ذكر الله - اختر الإجراء المطلوب" });
+
+    if (selection) {
+        if (selection.label.includes("عرض ذكر الآن")) {
+            showTasbeeh();
+        } else if (selection.label.includes("إيقاف مؤقت")) {
+            setNextReminder(15);
+            updateStatusBar();
+            vscode.window.showInformationMessage("تم تأجيل التنبيه القادم لـ 15 دقيقة.");
+        } else if (selection.label.includes("تغيير المدة الزمنية")) {
+            vscode.commands.executeCommand('workbench.action.openSettings', 'tasbeeh.interval');
+        }
+    }
+}
+
 function deactivate() {
-    if (intervalId) {
-        clearInterval(intervalId);
+    if (timerId) {
+        clearInterval(timerId);
+    }
+    if (statusBarItem) {
+        statusBarItem.dispose();
     }
 }
 

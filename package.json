@@ -2,7 +2,7 @@
   "name": "tasbeeh-reminder",
   "displayName": "Tasbeeh",
   "description": "اضافة بسيطة تعرض تسبيح وذكر كل مدة زمنية تحددها",
-  "version": "1.0.1",
+  "version": "2.0.0",
   "publisher": "MidoGhanam",
   "icon": "icon.png",
   "engines": {
@@ -47,6 +47,10 @@
       {
         "command": "tasbeeh.showNow",
         "title": "Tasbeeh: اعرض ذكر الآن"
+      },
+      {
+        "command": "tasbeeh.showMenu",
+        "title": "Tasbeeh: خيارات التنبيه"
       }
     ]
   },
