@@ -2,7 +2,7 @@
   "name": "tasbeeh-reminder",
   "displayName": "Tasbeeh",
   "description": "اضافة بسيطة تعرض تسبيح وذكر كل مدة زمنية تحددها",
-  "version": "2.0.0",
+  "version": "3.0.0",
   "publisher": "MidoGhanam",
   "icon": "icon.png",
   "repository": {
@@ -43,7 +43,18 @@
             "اللهم صل وسلم على نبينا محمد",
             "حسبي الله لا إله إلا هو عليه توكلت وهو رب العرش العظيم"
           ],
-          "description": "قائمة الأذكار التي تظهر بشكل عشوائي"
+          "description": "قائمة الأذكار التي تظهر بشكل عشوائي (يتم استخدامها إذا تم اختيار الفئة 'مخصص')"
+        },
+        "tasbeeh.category": {
+          "type": "string",
+          "enum": ["عام (General)", "استغفار (Forgiveness)", "صباح ومساء (Morning/Evening)", "مخصص (Custom)"],
+          "default": "عام (General)",
+          "description": "فئة الأذكار المفضلة"
+        },
+        "tasbeeh.dailyGoal": {
+          "type": "number",
+          "default": 100,
+          "description": "الورد اليومي (الهدف الذي تريد تحقيقه يومياً)"
         }
       }
     },

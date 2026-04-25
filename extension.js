@@ -4,13 +4,15 @@ let statusBarItem;
 let nextReminderTime;
 let timerId;
 let outputChannel;
+let extensionContext;
 
 /**
  * @param {vscode.ExtensionContext} context
  */
 function activate(context) {
+    extensionContext = context;
     outputChannel = vscode.window.createOutputChannel("Tasbeeh Reminder");
-    outputChannel.appendLine('Tasbeeh Reminder v2 is now active!');
+    outputChannel.appendLine('Tasbeeh Reminder v3 is now active!');
 
     // إنشاء أيقونة شريط الحالة (Status Bar)
     statusBarItem = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Right, 100);
@@ -82,13 +84,64 @@ function updateStatusBar() {
     // إذا كان المتبقي أقل من دقيقة نكتب <1m
     let displayText = diffMinutes > 0 ? `${diffMinutes}m` : `<1m`;
     
-    statusBarItem.text = `📿 ${displayText}`;
+    // إحضار الورد اليومي
+    const config = vscode.workspace.getConfiguration('tasbeeh');
+    const goal = config.get('dailyGoal') || 100;
+    const currentCount = getDailyCount();
+    
+    statusBarItem.text = `📿 ${displayText} | 📈 ${currentCount}/${goal}`;
     statusBarItem.tooltip = "ذكر الله - اضغط هنا للخيارات";
 }
 
-function showTasbeeh() {
+function getDailyCount() {
+    if (!extensionContext) return 0;
+    const today = new Date().toISOString().split('T')[0];
+    return extensionContext.globalState.get(`tasbeeh_count_${today}`, 0);
+}
+
+function incrementDailyCount() {
+    if (!extensionContext) return;
+    const today = new Date().toISOString().split('T')[0];
+    const count = getDailyCount() + 1;
+    extensionContext.globalState.update(`tasbeeh_count_${today}`, count);
+    updateStatusBar();
+}
+
+function getMessages() {
     const config = vscode.workspace.getConfiguration('tasbeeh');
-    const messages = config.get('messages');
+    const category = config.get('category') || "عام (General)";
+    
+    if (category.startsWith("استغفار")) {
+        return [
+            "أستغفر الله العظيم وأتوب إليه", 
+            "اللهم اغفر لي وارحمني", 
+            "أستغفر الله الذي لا إله إلا هو الحي القيوم وأتوب إليه", 
+            "سبحانك اللهم وبحمدك أشهد أن لا إله إلا أنت أستغفرك وأتوب إليك"
+        ];
+    } else if (category.startsWith("صباح ومساء")) {
+        return [
+            "بسم الله الذي لا يضر مع اسمه شيء في الأرض ولا في السماء وهو السميع العليم", 
+            "رضيت بالله رباً وبالإسلام ديناً وبمحمد صلى الله عليه وسلم نبياً", 
+            "حسبي الله لا إله إلا هو عليه توكلت وهو رب العرش العظيم", 
+            "اللهم بك أصبحنا وبك أمسينا وبك نحيا وبك نموت وإليك النشور"
+        ];
+    } else if (category.startsWith("عام")) {
+        return [
+            "سبحان الله وبحمده، سبحان الله العظيم", 
+            "الحمد لله رب العالمين", 
+            "لا إله إلا الله وحده لا شريك له", 
+            "الله أكبر", 
+            "لا حول ولا قوة إلا بالله", 
+            "اللهم صل وسلم على نبينا محمد"
+        ];
+    } else {
+        return config.get('messages'); // مخصص
+    }
+}
+
+function showTasbeeh() {
+    const messages = getMessages();
+
     
     if (messages && messages.length > 0) {
         const randomIndex = Math.floor(Math.random() * messages.length);
@@ -96,7 +149,15 @@ function showTasbeeh() {
         // إضافة زر "تم الذكر" للتشجيع
         vscode.window.showInformationMessage(message, "تم الذكر 🤍").then(selection => {
             if (selection === "تم الذكر 🤍") {
+                incrementDailyCount();
                 outputChannel.appendLine('تم تأكيد الذكر، تقبل الله!');
+                
+                // تهنئة بسيطة عند الوصول للهدف
+                const config = vscode.workspace.getConfiguration('tasbeeh');
+                const goal = config.get('dailyGoal') || 100;
+                if (getDailyCount() === goal) {
+                    vscode.window.showInformationMessage("🎉 ما شاء الله! لقد أكملت وردك اليومي من الأذكار. تقبل الله منك.");
+                }
             }
         });
     }
