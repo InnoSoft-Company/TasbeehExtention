@@ -4,20 +4,46 @@
 
 # 📿 Tasbeeh Reminder | ذكر الله
 
-[![GitHub repository](https://img.shields.io/badge/GitHub-Repository-blue?logo=github)](https://github.com/InnoSoft-Company/TasbeehExtention)
+<p align="center">
+  <a href="https://marketplace.visualstudio.com/items?itemName=MidoGhanam.tasbeeh-reminder">
+    <img src="https://img.shields.io/visual-studio-marketplace/v/MidoGhanam.tasbeeh-reminder?style=flat-square&color=007acc&label=Marketplace" alt="VS Code Marketplace">
+  </a>
+  <a href="https://marketplace.visualstudio.com/items?itemName=MidoGhanam.tasbeeh-reminder">
+    <img src="https://img.shields.io/visual-studio-marketplace/i/MidoGhanam.tasbeeh-reminder?style=flat-square&color=orange&label=Installs" alt="Installs">
+  </a>
+  <a href="https://marketplace.visualstudio.com/items?itemName=MidoGhanam.tasbeeh-reminder">
+    <img src="https://img.shields.io/visual-studio-marketplace/r/MidoGhanam.tasbeeh-reminder?style=flat-square&color=yellow&label=Rating" alt="Rating">
+  </a>
+  <br>
+  <a href="https://github.com/InnoSoft-Company/TasbeehExtention">
+    <img src="https://img.shields.io/github/v/release/InnoSoft-Company/TasbeehExtention?style=flat-square&color=success&label=Release" alt="GitHub Release">
+  </a>
+  <a href="https://github.com/InnoSoft-Company/TasbeehExtention/stargazers">
+    <img src="https://img.shields.io/github/stars/InnoSoft-Company/TasbeehExtention?style=flat-square&color=gold&label=Stars" alt="Stars">
+  </a>
+  <a href="https://github.com/InnoSoft-Company/TasbeehExtention/network/members">
+    <img src="https://img.shields.io/github/forks/InnoSoft-Company/TasbeehExtention?style=flat-square&color=lightgrey&label=Forks" alt="Forks">
+  </a>
+  <a href="https://github.com/InnoSoft-Company/TasbeehExtention/issues">
+    <img src="https://img.shields.io/github/issues/InnoSoft-Company/TasbeehExtention?style=flat-square&color=red&label=Issues" alt="Issues">
+  </a>
+  <a href="https://github.com/InnoSoft-Company/TasbeehExtention/blob/main/LICENSE">
+    <img src="https://img.shields.io/github/license/InnoSoft-Company/TasbeehExtention?style=flat-square&color=blue&label=License" alt="License">
+  </a>
+</p>
+
+---
 
 **ألا بذكر الله تطمئن القلوب** - إضافة ذكية لبرنامج VS Code تهدف إلى مرافقة المبرمج المسلم في رحلته اليومية، لتذكره بذكر الله وتجعله رطباً بلسانه حتى في أوج تركيزه البرمجي.
 
 ---
 
-## ✨ المميزات الخارقة للإصدار (v3.0.0) 🚀
+## ✨ المميزات الخارقة (v3.0.0) 🚀
 - **📈 نظام الورد اليومي**: متابعة عدد التسبيحات التي قمت بها اليوم مباشرة من شريط الحالة (مثلاً: `📈 15/100`).
 - **📿 العداد الحي (Status Bar)**: عداد تنازلي دائم أسفل يمين الشاشة يوضح الوقت المتبقي للتنبيه القادم.
 - **📂 فئات الأذكار الذكية**: يمكنك الآن الاختيار بين حزم مخصصة:
   - (عام، استغفار، صباح ومساء، أو إنشاء قائمتك المخصصة).
-- **⚡ قائمة سريعة (Quick Pick)**: اضغط على العداد في الأسفل لتتمكن من:
-  - عرض ذكر فوري.
-  - إيقاف مؤقت (Snooze) لتأجيل التنبيه 15 دقيقة وقت التركيز العميق.
+- **⚡ قائمة سريعة (Quick Pick)**: اضغط على العداد في الأسفل لفتح خيارات سريعة (عرض ذكر فوري، Snooze، الإعدادات).
 - **⚙️ تحكم كامل**: إمكانية تخصيص المدة الزمنية والورد اليومي من الإعدادات.
 
 ---
@@ -32,32 +58,24 @@
      - `Interval`: المدة بين كل تنبيه وآخر.
      - `Category`: لاختيار نوع الأذكار (استغفار، صباح ومساء، الخ).
      - `Daily Goal`: لتحديد هدفك اليومي (الافتراضي 100).
-4. اضغط على العداد في الأسفل لفتح **القائمة السريعة** وتجربة عرض التنبيهات أو تأجيلها.
 
 ---
 
-## 🗺️ خارطة الطريق (Roadmap) - الرؤية القادمة
-نحن لا نبني مجرد "منبه"، بل نبني رفيقاً روحياً للمبرمج. إليك ما نخطط له في النسخ القادمة:
+## 🗺️ خارطة الطريق (Roadmap)
+نحن لا نبني مجرد "منبه"، بل نبني رفيقاً روحياً للمبرمج. 
 
 ### 🟢 المرحلة القادمة (قريباً)
 - **🔊 التنبيهات الصوتية**: خيار لتشغيل صوت خفيف وجميل مع التنبيه.
 - **🌍 تعدد اللغات**: دعم كامل للغة الإنجليزية لتكون مفيدة للمسلمين حول العالم.
-- **🌙 الوضع الليلي المطور**: تناسق ألوان التنبيهات بشكل أفضل مع كافة الـ Themes.
 
 ### 🟡 المرحلة المتقدمة
-- **📉 إحصائيات متقدمة**: لوحة تحكم رسومية تظهر لك تقرير أسبوعي وشهر.
+- **📉 إحصائيات متقدمة**: لوحة تحكم رسومية تظهر لك تقريراً أسبوعياً وشهرياً.
 - **🧠 تكامل التركيز**: إيقاف التنبيهات تلقائياً عند الدخول في وضع الاجتماعات (Do Not Disturb).
-
-### 🔴 الرؤية البعيدة
-- **📱 المزامنة**: ربط إحصائياتك مع تطبيق هاتف محمول لمتابعة وردك في كل مكان.
-- **🤝 مجتمع الذاكرين**: خيار (اختياري) لرؤية عدد الذاكرين حول العالم في هذه اللحظة.
 
 ---
 
 ## 🤝 المساهمة
 هذا المشروع "صدقة جارية"، نرحب بكل مبرمج يود المساهمة في تحسين الكود أو إضافة أذكار جديدة. 
-
----
 
 ## 📄 الترخيص
 هذا المشروع مرخص بموجب رخصة [MIT](https://github.com/InnoSoft-Company/TasbeehExtention/blob/main/LICENSE).
