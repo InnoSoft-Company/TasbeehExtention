@@ -1,4 +1,6 @@
 const vscode = require('vscode');
+const fs = require('fs');
+const path = require('path');
 
 let statusBarItem;
 let nextReminderTime;
@@ -12,7 +14,7 @@ let extensionContext;
 function activate(context) {
   extensionContext = context;
   outputChannel = vscode.window.createOutputChannel("Tasbeeh Reminder");
-  outputChannel.appendLine('Tasbeeh Reminder v3 is now active!');
+  outputChannel.appendLine('Tasbeeh Reminder v4 is now active!');
 
   // إنشاء أيقونة شريط الحالة (Status Bar)
   statusBarItem = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Right, 100);
@@ -107,6 +109,29 @@ function incrementDailyCount() {
   updateStatusBar();
 }
 
+function getQuranVerse() {
+  try {
+    const quranDir = path.join(extensionContext.extensionPath, 'quran_json_files');
+    const files = fs.readdirSync(quranDir).filter(f => f.endsWith('.json'));
+    
+    if (files.length === 0) return null;
+
+    const randomFile = files[Math.floor(Math.random() * files.length)];
+    const filePath = path.join(quranDir, randomFile);
+    const content = JSON.parse(fs.readFileSync(filePath, 'utf8'));
+    
+    const verses = Object.keys(content.verse);
+    const randomVerseKey = verses[Math.floor(Math.random() * verses.length)];
+    const verseText = content.verse[randomVerseKey];
+    const verseNumber = randomVerseKey.split('_')[1];
+
+    return `"${verseText}" - سورة ${content.name} (${verseNumber})`;
+  } catch (err) {
+    outputChannel.appendLine('Error reading Quran files: ' + err.message);
+    return null;
+  }
+}
+
 function getMessages() {
   const config = vscode.workspace.getConfiguration('tasbeeh');
   const category = config.get('category') || "عام (General)";
@@ -134,6 +159,9 @@ function getMessages() {
       "لا حول ولا قوة إلا بالله",
       "اللهم صل وسلم على نبينا محمد"
     ];
+  } else if (category.startsWith("قرآن كريم")) {
+    const verse = getQuranVerse();
+    return verse ? [verse] : ["سبحان الله وبحمده"];
   } else {
     return config.get('messages'); // مخصص
   }
@@ -141,13 +169,17 @@ function getMessages() {
 
 function showTasbeeh() {
   const messages = getMessages();
+
   if (messages && messages.length > 0) {
     const randomIndex = Math.floor(Math.random() * messages.length);
     const message = messages[randomIndex];
+    // إضافة زر "تم الذكر" للتشجيع
     vscode.window.showInformationMessage(message, "تم الذكر 🤍").then(selection => {
       if (selection === "تم الذكر 🤍") {
         incrementDailyCount();
         outputChannel.appendLine('تم تأكيد الذكر، تقبل الله!');
+
+        // تهنئة بسيطة عند الوصول للهدف
         const config = vscode.workspace.getConfiguration('tasbeeh');
         const goal = config.get('dailyGoal') || 100;
         if (getDailyCount() === goal) {
@@ -164,7 +196,9 @@ async function showMenu() {
     { label: "$(clock) إيقاف مؤقت (Snooze)", description: "تأجيل التنبيه القادم لمدة 15 دقيقة" },
     { label: "$(gear) تغيير المدة الزمنية", description: "يفتح إعدادات الإضافة لتغيير المدة" }
   ];
+
   const selection = await vscode.window.showQuickPick(options, { placeHolder: "قائمة ذكر الله - اختر الإجراء المطلوب" });
+
   if (selection) {
     if (selection.label.includes("عرض ذكر الآن")) {
       showTasbeeh();
@@ -179,8 +213,12 @@ async function showMenu() {
 }
 
 function deactivate() {
-  if (timerId) { clearInterval(timerId); }
-  if (statusBarItem) { statusBarItem.dispose(); }
+  if (timerId) {
+    clearInterval(timerId);
+  }
+  if (statusBarItem) {
+    statusBarItem.dispose();
+  }
 }
 
 module.exports = {

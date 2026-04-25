@@ -2,7 +2,7 @@
   "name": "tasbeeh-reminder",
   "displayName": "Tasbeeh",
   "description": "اضافة بسيطة تعرض تسبيح وذكر كل مدة زمنية تحددها",
-  "version": "3.0.0",
+  "version": "4.0.0",
   "publisher": "MidoGhanam",
   "icon": "icon.png",
   "repository": {
@@ -47,7 +47,7 @@
         },
         "tasbeeh.category": {
           "type": "string",
-          "enum": ["عام (General)", "استغفار (Forgiveness)", "صباح ومساء (Morning/Evening)", "مخصص (Custom)"],
+          "enum": ["عام (General)", "استغفار (Forgiveness)", "صباح ومساء (Morning/Evening)", "قرآن كريم (Quran)", "مخصص (Custom)"],
           "default": "عام (General)",
           "description": "فئة الأذكار المفضلة"
         },
