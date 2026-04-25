@@ -1,0 +1,56 @@
+{
+  "name": "tasbeeh-reminder",
+  "displayName": "Tasbeeh",
+  "description": "اضافة بسيطة تعرض تسبيح وذكر كل مدة زمنية تحددها",
+  "version": "1.0.1",
+  "publisher": "MidoGhanam",
+  "icon": "icon.png",
+  "engines": {
+    "vscode": "^1.80.0"
+  },
+  "categories": [
+    "Other"
+  ],
+  "activationEvents": [
+    "onStartupFinished"
+  ],
+  "main": "./extension.js",
+  "contributes": {
+    "configuration": {
+      "title": "Tasbeeh Reminder",
+      "properties": {
+        "tasbeeh.interval": {
+          "type": "number",
+          "default": 30,
+          "description": "المدة الزمنية بالدقائق لظهور التسبيح (مثال: 30)"
+        },
+        "tasbeeh.messages": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "default": [
+            "سبحان الله وبحمده، سبحان الله العظيم",
+            "الحمد لله رب العالمين",
+            "لا إله إلا الله وحده لا شريك له",
+            "الله أكبر",
+            "لا حول ولا قوة إلا بالله",
+            "أستغفر الله العظيم وأتوب إليه",
+            "اللهم صل وسلم على نبينا محمد",
+            "حسبي الله لا إله إلا هو عليه توكلت وهو رب العرش العظيم"
+          ],
+          "description": "قائمة الأذكار التي تظهر بشكل عشوائي"
+        }
+      }
+    },
+    "commands": [
+      {
+        "command": "tasbeeh.showNow",
+        "title": "Tasbeeh: اعرض ذكر الآن"
+      }
+    ]
+  },
+  "devDependencies": {
+    "@types/vscode": "^1.80.0"
+  }
+}
