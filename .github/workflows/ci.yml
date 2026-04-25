@@ -2,31 +2,30 @@ name: CI
 
 on:
   push:
-    branches: [ main ]
+    branches: [main]
   pull_request:
-    branches: [ main ]
+    branches: [main]
 
 jobs:
   build:
     runs-on: ubuntu-latest
-
     steps:
-    - uses: actions/checkout@v3
-    
-    - name: Use Node.js
-      uses: actions/setup-node@v3
-      with:
-        node-version: '18.x'
-        cache: 'npm'
-        
-    - name: Install dependencies
-      run: npm install
-      
-    - name: Package extension
-      run: npx @vscode/vsce package --allow-missing-repository
-      
-    - name: Upload VSIX
-      uses: actions/upload-artifact@v3
-      with:
-        name: tasbeeh-reminder-vsix
-        path: "*.vsix"
+      - uses: actions/checkout@v3
+
+      - name: Use Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18.x'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Package extension
+        run: npx @vscode/vsce package --allow-missing-repository
+
+      - name: Upload VSIX
+        uses: actions/upload-artifact@v3
+        with:
+          name: tasbeeh-reminder-vsix
+          path: "*.vsix"
