@@ -1,8 +1,10 @@
 <p align="center">
-  <img src="https://raw.githubusercontent.com/MidoGhanam/tasbeeh-reminder/main/icon.png" width="128" alt="Tasbeeh Reminder Icon">
+  <img src="https://raw.githubusercontent.com/InnoSoft-Company/TasbeehExtention/main/icon.png" width="128" alt="Tasbeeh Reminder Icon">
 </p>
 
 # 📿 Tasbeeh Reminder | ذكر الله
+
+[![GitHub repository](https://img.shields.io/badge/GitHub-Repository-blue?logo=github)](https://github.com/InnoSoft-Company/TasbeehExtention)
 
 **ألا بذكر الله تطمئن القلوب** - إضافة ذكية لبرنامج VS Code تهدف إلى مرافقة المبرمج المسلم في رحلته اليومية، لتذكره بذكر الله وتجعله رطباً بلسانه حتى في أوج تركيزه البرمجي.
 
@@ -54,7 +56,7 @@
 ---
 
 ## 📄 الترخيص
-هذا المشروع مرخص بموجب رخصة MIT.
+هذا المشروع مرخص بموجب رخصة [MIT](https://github.com/InnoSoft-Company/TasbeehExtention/blob/main/LICENSE).
 
 <p align="center">
   صُنع بكل حب ❤️ لتذكيرنا بالله وسط زحام الأكواد.

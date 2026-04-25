@@ -5,6 +5,10 @@
   "version": "2.0.0",
   "publisher": "MidoGhanam",
   "icon": "icon.png",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/InnoSoft-Company/TasbeehExtention"
+  },
   "engines": {
     "vscode": "^1.80.0"
   },
