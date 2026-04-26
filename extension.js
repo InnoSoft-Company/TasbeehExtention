@@ -8,6 +8,7 @@ let timerId;
 let outputChannel;
 let extensionContext;
 let quranCache = null;
+let isNotificationVisible = false;
 
 /**
  * @param {vscode.ExtensionContext} context
@@ -80,7 +81,12 @@ function updateStatusBar() {
   if (diffMs <= 0) {
     showTasbeeh();
     const config = vscode.workspace.getConfiguration('tasbeeh');
-    setNextReminder(config.get('interval'));
+    const interval = config.get('interval');
+    if (interval <= 0) {
+      statusBarItem.hide();
+      return;
+    }
+    setNextReminder(interval);
   }
 
   // حساب الدقائق المتبقية لعرضها
@@ -211,6 +217,90 @@ async function showQuranBrowser() {
   }
 }
 
+async function searchQuran() {
+  const cache = loadQuranCache();
+  if (cache.length === 0) {
+    vscode.window.showErrorMessage("عذراً، لم يتم العثور على ملفات القرآن الكريم.");
+    return;
+  }
+
+  const searchQuery = await vscode.window.showInputBox({
+    placeHolder: "أدخل كلمة للبحث عنها في القرآن الكريم",
+    prompt: "بحث في آيات القرآن الكريم"
+  });
+
+  if (!searchQuery || searchQuery.trim() === '') return;
+
+  const results = [];
+  for (const surah of cache) {
+    for (const [key, verseText] of Object.entries(surah.verses)) {
+      if (verseText.includes(searchQuery)) {
+        const verseNum = key.split('_')[1];
+        results.push({
+          label: `سورة ${surah.name} - آية ${verseNum}`,
+          detail: verseText,
+          surahName: surah.name,
+          verseNumber: verseNum,
+          verseText: verseText
+        });
+      }
+    }
+  }
+
+  if (results.length === 0) {
+    vscode.window.showInformationMessage(`لم يتم العثور على نتائج لـ "${searchQuery}"`);
+    return;
+  }
+
+  const selected = await vscode.window.showQuickPick(results, {
+    placeHolder: `تم العثور على ${results.length} نتيجة. اختر آية لعرضها:`,
+    matchOnDetail: true
+  });
+
+  if (selected) {
+    vscode.window.showInformationMessage(`"${selected.verseText}" - سورة ${selected.surahName} (${selected.verseNumber})`, "تم القراءة 🤍").then(selection => {
+      if (selection === "تم القراءة 🤍") {
+        incrementDailyCount();
+      }
+    });
+  }
+}
+
+async function exportStats() {
+  if (!extensionContext) return;
+  const keys = extensionContext.globalState.keys().filter(k => k.startsWith('tasbeeh_count_'));
+  if (keys.length === 0) {
+    vscode.window.showInformationMessage("لا توجد إحصائيات لتصديرها بعد.");
+    return;
+  }
+
+  // ترتيب التواريخ تصاعدياً
+  keys.sort();
+
+  let csvContent = "\uFEFFالتاريخ,عدد الأذكار\n"; // \uFEFF for Excel UTF-8 BOM
+  keys.forEach(k => {
+    const date = k.replace('tasbeeh_count_', '');
+    const count = extensionContext.globalState.get(k);
+    csvContent += `${date},${count}\n`;
+  });
+
+  const uri = await vscode.window.showSaveDialog({
+    defaultUri: vscode.Uri.file('tasbeeh_stats.csv'),
+    filters: {
+      'CSV Files': ['csv']
+    }
+  });
+
+  if (uri) {
+    try {
+      fs.writeFileSync(uri.fsPath, csvContent, 'utf8');
+      vscode.window.showInformationMessage("تم تصدير الإحصائيات بنجاح!");
+    } catch (err) {
+      vscode.window.showErrorMessage("حدث خطأ أثناء التصدير: " + err.message);
+    }
+  }
+}
+
 function getMessages() {
   const config = vscode.workspace.getConfiguration('tasbeeh');
   const category = config.get('category') || "عام (General)";
@@ -262,13 +352,21 @@ function getMessages() {
 }
 
 function showTasbeeh() {
+  // منع تراكم التنبيهات في حال عدم تفاعل المستخدم (Idle Detection)
+  if (isNotificationVisible) return;
+  
   const messages = getMessages();
 
   if (messages && messages.length > 0) {
     const randomIndex = Math.floor(Math.random() * messages.length);
     const message = messages[randomIndex];
+    
+    isNotificationVisible = true;
+    
     // إضافة زر "تم الذكر" للتشجيع
     vscode.window.showInformationMessage(message, "تم الذكر 🤍").then(selection => {
+      isNotificationVisible = false;
+      
       if (selection === "تم الذكر 🤍") {
         incrementDailyCount();
         outputChannel.appendLine('تم تأكيد الذكر، تقبل الله!');
@@ -288,6 +386,8 @@ async function showMenu() {
   const options = [
     { label: "$(heart) عرض ذكر الآن", description: "يظهر لك رسالة تنبيه فورية" },
     { label: "$(book) تصفح القرآن الكريم", description: "اختر سورة وآية محددة لقراءتها" },
+    { label: "$(search) البحث في القرآن", description: "ابحث عن كلمة أو نص في آيات القرآن" },
+    { label: "$(graph) تصدير الإحصائيات", description: "تصدير سجل الأذكار اليومية كملف CSV" },
     { label: "$(clock) إيقاف مؤقت (Snooze)", description: "تأجيل التنبيه القادم لمدة 15 دقيقة" },
     { label: "$(gear) إعدادات الإضافة", description: "تغيير الفئة، الهدف اليومي، أو المدة" }
   ];
@@ -299,6 +399,10 @@ async function showMenu() {
       showTasbeeh();
     } else if (selection.label.includes("تصفح القرآن الكريم")) {
       showQuranBrowser();
+    } else if (selection.label.includes("البحث في القرآن")) {
+      searchQuran();
+    } else if (selection.label.includes("تصدير الإحصائيات")) {
+      exportStats();
     } else if (selection.label.includes("إيقاف مؤقت")) {
       setNextReminder(15);
       updateStatusBar();
