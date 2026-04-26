@@ -1,7 +1,7 @@
 {
   "name": "tasbeeh-reminder",
   "displayName": "Tasbeeh",
-  "description": "اضافة بسيطة تعرض تسبيح وذكر كل مدة زمنية تحددها",
+  "description": "رفيق المبرمج المسلم: تنبيهات دورية بالأذكار، التسبيح، وآيات من القرآن الكريم لتعطير وقتك بذكر الله أثناء العمل.",
   "version": "4.0.0",
   "publisher": "MidoGhanam",
   "icon": "icon.png",
