@@ -2,7 +2,7 @@
   "name": "tasbeeh-reminder",
   "displayName": "Tasbeeh",
   "description": "رفيق المبرمج المسلم: تنبيهات دورية بالأذكار، التسبيح، وآيات من القرآن الكريم لتعطير وقتك بذكر الله أثناء العمل.",
-  "version": "4.0.0",
+  "version": "4.0.1",
   "publisher": "MidoGhanam",
   "icon": "icon.png",
   "repository": {
@@ -61,11 +61,15 @@
     "commands": [
       {
         "command": "tasbeeh.showNow",
-        "title": "Tasbeeh: اعرض ذكر الآن"
+        "title": "Tasbeeh: عرض ذكر الآن"
       },
       {
         "command": "tasbeeh.showMenu",
-        "title": "Tasbeeh: خيارات التنبيه"
+        "title": "Tasbeeh: خيارات التنبيه والقائمة"
+      },
+      {
+        "command": "tasbeeh.readQuran",
+        "title": "Tasbeeh: تصفح وقراءة القرآن الكريم"
       }
     ]
   },
